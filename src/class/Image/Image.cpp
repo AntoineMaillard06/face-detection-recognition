@@ -4,5 +4,5 @@ face::Image::Image(const std::string &path)
 {
     face::PGMReader reader;
 
-    reader.process("./BioID.pgm");
+    face::Mat test = reader.process("./BioID.pgm");
 }

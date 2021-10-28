@@ -13,16 +13,19 @@ face::PGMReader::~PGMReader()
     this->freeContent();
 }
 
-void face::PGMReader::process(const std::string &path)
+face::Mat face::PGMReader::process(const std::string &path)
 {
     std::fstream file("./BioID.pgm", std::ios::in);
     const long fileSize = face::PGMReader::getFileSize(path);
 
     std::cout << "File " << path << " has size " << fileSize << " bytes." << std::endl;
+    if (this->_content) {
+        this->freeContent();
+    }
     if (fileSize == -1) {
         throw face::Exception("File is empty or non-existent.");
     }
-    if (file.is_open()) {
+    if (file.is_open() && fileSize > 0) {
         this->_content = new char[fileSize + 1];
         if (this->_content) {
             this->_content[fileSize] = '\0';
@@ -33,9 +36,8 @@ void face::PGMReader::process(const std::string &path)
         file.read(this->_content, fileSize);
         file.close();
     }
-    if (this->_content && fileSize > 0) {
-        this->computeHeader();
-    }
+    this->computeHeader();
+    return this->computeData(this->_header.gray_scales <= 255 ? 1 : 2);
 }
 
 void face::PGMReader::computeHeader()
@@ -58,6 +60,30 @@ void face::PGMReader::computeHeader()
     }
 }
 
+face::Mat face::PGMReader::computeData(const u_char bytesPerPixel)
+{
+    std::vector<u_int32_t> image_data(this->_header.width * this->_header.height);
+    uint32_t index = 0;
+
+    this->skipHeader(index);
+    for (int i = 0; i < (this->_header.width * this->_header.height) / bytesPerPixel; i += 1, index += bytesPerPixel) {
+        image_data.push_back(bytesPerPixel == 1 ? this->_content[index] : static_cast<u_short>(this->_content[index]));
+    }
+    return face::Mat(this->_header, image_data);
+}
+
+void face::PGMReader::skipHeader(uint32_t &index)
+{
+    uint8_t separatorCount = 0;
+
+    for (index = 0; this->_content && separatorCount < HEADER_ELEM_COUNT; index += 1) {
+        if (this->_content[index] == '\n' || this->_content[index] == '\t'
+            || this->_content[index] == ' ' || this->_content[index] == '\r') {
+            separatorCount += 1;
+        }
+    }
+}
+
 const face::pgm_header_t &face::PGMReader::getHeader() const
 {
     return this->_header;
@@ -65,7 +91,7 @@ const face::pgm_header_t &face::PGMReader::getHeader() const
 
 void face::PGMReader::freeContent()
 {
-    if (this->_content) {
+    if (this->_content != nullptr) {
         delete []this->_content;
     }
 }
