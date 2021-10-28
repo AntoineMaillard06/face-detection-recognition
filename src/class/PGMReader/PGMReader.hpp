@@ -6,6 +6,8 @@
 
 #include "./../Exception/Exception.hpp"
 
+#define HEADER_REGEXP "^(P2|P5)[\\t| |\\r?\\n]([0-9]+)[\\t| |\\r?\\n]([0-9]+)[\\t| |\\r?\\n]([0-9]+)[\\t| |\\r?\\n]"
+
 namespace face {
 
     typedef struct pgm_header_s {
