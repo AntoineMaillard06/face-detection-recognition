@@ -1,6 +1,3 @@
-#include <iostream>
-
-#include "./../Exception/Exception.hpp"
 #include "./../PGMReader/PGMReader.hpp"
 
 namespace face {
