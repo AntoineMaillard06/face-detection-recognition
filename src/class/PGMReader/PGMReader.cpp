@@ -23,7 +23,8 @@ void face::PGMReader::process(const std::string &path)
         throw face::Exception("File is empty or non-existent.");
     }
     if (file.is_open()) {
-        this->_content = new char[fileSize];
+        this->_content = new char[fileSize + 1];
+        this->_content[fileSize] = '\0';
         file.seekg(0, std::ios::beg);
         file.read(this->_content, fileSize);
         file.close();
