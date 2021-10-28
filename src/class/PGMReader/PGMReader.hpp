@@ -15,7 +15,8 @@ namespace face {
 
         private:
         void computeHeader();
-        face::Mat computeData(const u_char bytesPerPixel);
+        face::Mat computeBinaryData(const u_char bytesPerPixel);
+        face::Mat computeTextData();
         void skipHeader(uint32_t &index);
 
         void freeContent();

@@ -37,7 +37,9 @@ face::Mat face::PGMReader::process(const std::string &path)
         file.close();
     }
     this->computeHeader();
-    return this->computeData(this->_header.gray_scales <= 255 ? 1 : 2);
+    return this->_header.is_binary
+        ? this->computeBinaryData(this->_header.gray_scales <= 255 ? 1 : 2)
+        : this->computeTextData();
 }
 
 void face::PGMReader::computeHeader()
@@ -60,7 +62,7 @@ void face::PGMReader::computeHeader()
     }
 }
 
-face::Mat face::PGMReader::computeData(const u_char bytesPerPixel)
+face::Mat face::PGMReader::computeBinaryData(const u_char bytesPerPixel)
 {
     std::vector<u_int32_t> image_data(this->_header.width * this->_header.height);
     uint32_t index = 0;
@@ -68,6 +70,28 @@ face::Mat face::PGMReader::computeData(const u_char bytesPerPixel)
     this->skipHeader(index);
     for (int i = 0; i < (this->_header.width * this->_header.height) / bytesPerPixel; i += 1, index += bytesPerPixel) {
         image_data.push_back(bytesPerPixel == 1 ? this->_content[index] : static_cast<u_short>(this->_content[index]));
+    }
+    return face::Mat(this->_header, image_data);
+}
+
+face::Mat face::PGMReader::computeTextData()
+{
+    std::vector<u_int32_t> image_data(this->_header.width * this->_header.height);
+    uint32_t index = 0;
+    std::string pixel;
+
+    this->skipHeader(index);
+    for(; this->_content[index] != '\0' ; index += 1) {
+        if (this->_content[index] >= '0' && this->_content[index] <= '9') {
+            pixel += this->_content[index];
+        } else {
+            image_data.push_back(std::stoi(pixel));
+            pixel.clear();
+        }
+    }
+    if (pixel.length() > 0) {
+        image_data.push_back(std::stoi(pixel));
+        pixel.clear();
     }
     return face::Mat(this->_header, image_data);
 }
