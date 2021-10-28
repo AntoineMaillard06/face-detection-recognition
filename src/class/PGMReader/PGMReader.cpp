@@ -40,7 +40,7 @@ void face::PGMReader::process(const std::string &path)
 
 void face::PGMReader::computeHeader()
 {
-    const std::regex headerRegExp("^(P2|P5)\\n([0-9]+)\\n([0-9]+)\\n([0-9]+)\\n");
+    const std::regex headerRegExp("^(P2|P5)[\\t| |\\r?\\n]([0-9]+)[\\t| |\\r?\\n]([0-9]+)[\\t| |\\r?\\n]([0-9]+)[\\t| |\\r?\\n]");
     std::smatch headerMatch;
     const std::string content(this->_content);
 
