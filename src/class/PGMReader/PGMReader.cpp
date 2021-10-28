@@ -24,7 +24,11 @@ void face::PGMReader::process(const std::string &path)
     }
     if (file.is_open()) {
         this->_content = new char[fileSize + 1];
-        this->_content[fileSize] = '\0';
+        if (this->_content) {
+            this->_content[fileSize] = '\0';
+        } else {
+            throw face::Exception("Memory allocation error: can't allocate memory.");
+        }
         file.seekg(0, std::ios::beg);
         file.read(this->_content, fileSize);
         file.close();
