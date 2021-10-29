@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "./../Mat/Mat.hpp"
 
 #define HEADER_REGEXP "^(P2|P5)[\\t| |\\r?\\n]([0-9]+)[\\t| |\\r?\\n]([0-9]+)[\\t| |\\r?\\n]([0-9]+)[\\t| |\\r?\\n]"
@@ -9,14 +11,14 @@ namespace face {
         ~PGMReader();
 
         static long getFileSize(const std::string &fileName);
-        face::Mat process(const std::string &path);
+        std::shared_ptr<face::Mat> process(const std::string &path);
 
         const pgm_header_t &getHeader() const;
 
         private:
         void computeHeader();
-        face::Mat computeBinaryData(const u_char bytesPerPixel);
-        face::Mat computeTextData();
+        std::shared_ptr<face::Mat> computeBinaryData(const u_char bytesPerPixel);
+        std::shared_ptr<face::Mat> computeTextData();
         void skipHeader(uint32_t &index);
 
         void freeContent();

@@ -13,9 +13,9 @@ face::PGMReader::~PGMReader()
     this->freeContent();
 }
 
-face::Mat face::PGMReader::process(const std::string &path)
+std::shared_ptr<face::Mat> face::PGMReader::process(const std::string &path)
 {
-    std::fstream file("./BioID.pgm", std::ios::in);
+    std::fstream file(path, std::ios::in);
     const long fileSize = face::PGMReader::getFileSize(path);
 
     std::cout << "File " << path << " has size " << fileSize << " bytes." << std::endl;
@@ -62,7 +62,7 @@ void face::PGMReader::computeHeader()
     }
 }
 
-face::Mat face::PGMReader::computeBinaryData(const u_char bytesPerPixel)
+std::shared_ptr<face::Mat> face::PGMReader::computeBinaryData(const u_char bytesPerPixel)
 {
     std::vector<u_int32_t> image_data(this->_header.width * this->_header.height);
     uint32_t index = 0;
@@ -71,10 +71,10 @@ face::Mat face::PGMReader::computeBinaryData(const u_char bytesPerPixel)
     for (int i = 0; i < (this->_header.width * this->_header.height) / bytesPerPixel; i += 1, index += bytesPerPixel) {
         image_data.push_back(bytesPerPixel == 1 ? this->_content[index] : static_cast<u_short>(this->_content[index]));
     }
-    return face::Mat(this->_header, image_data);
+    return std::make_shared<face::Mat>(this->_header, image_data);
 }
 
-face::Mat face::PGMReader::computeTextData()
+std::shared_ptr<face::Mat> face::PGMReader::computeTextData()
 {
     std::vector<u_int32_t> image_data(this->_header.width * this->_header.height);
     uint32_t index = 0;
@@ -93,7 +93,7 @@ face::Mat face::PGMReader::computeTextData()
         image_data.push_back(std::stoi(pixel));
         pixel.clear();
     }
-    return face::Mat(this->_header, image_data);
+    return std::make_shared<face::Mat>(this->_header, image_data);
 }
 
 void face::PGMReader::skipHeader(uint32_t &index)

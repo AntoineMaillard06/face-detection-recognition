@@ -11,4 +11,4 @@ add_executable(face main.cpp
                     src/class/Mat/Mat.cpp
                     src/class/Window/Window.cpp)
 
-target_link_libraries(face sfml-window)
+target_link_libraries(face pthread sfml-window sfml-graphics)
