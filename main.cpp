@@ -6,9 +6,8 @@ int main(int ac, char**av)
         face::Window appWindow;
         face::PGMReader imageReader;
 
-        std::shared_ptr<face::Mat> test = imageReader.process("./BioID.pgm");
+        appWindow.loadImage(imageReader.process("./BioID.pgm"));
 
-        appWindow.loadImage(test);
         appWindow.windowJoin();
     } catch (face::Exception err) {
         std::cout << err.what() << std::endl;
