@@ -1,9 +1,11 @@
-#include "./src/class/Image/Image.hpp"
+#include "./src/class/PGMReader/PGMReader.hpp"
 
 int main(int ac, char**av)
 {
     try {
-        face::Image test("./BioID.pgm");
+        face::PGMReader imageReader;
+
+        face::Mat test = imageReader.process("./BioID.pgm");
     } catch (face::Exception err) {
         std::cout << err.what() << std::endl;
     }
