@@ -64,33 +64,46 @@ void face::PGMReader::computeHeader()
 
 std::shared_ptr<face::Mat> face::PGMReader::computeBinaryData(const u_char bytesPerPixel)
 {
-    std::vector<u_int32_t> image_data(this->_header.width * this->_header.height);
+    std::shared_ptr<uint8_t[]> image_data(new uint8_t[4 * this->_header.width * this->_header.height]{0});
     uint32_t index = 0;
+    uint8_t gray = 0;
 
     this->skipHeader(index);
-    for (int i = 0; i < (this->_header.width * this->_header.height) / bytesPerPixel; i += 1, index += bytesPerPixel) {
-        image_data.push_back(bytesPerPixel == 1 ? this->_content[index] : static_cast<u_short>(this->_content[index]));
+    for (int i = 0, y = 0; i < (this->_header.width * this->_header.height) / bytesPerPixel; i += 1, y += 4, index += bytesPerPixel) {
+        gray = static_cast<uint8_t>(bytesPerPixel == 1 ? this->_content[index] : static_cast<u_short>(this->_content[index])) % 255;
+        image_data[y] = gray % 255;
+        image_data[y + 1] = gray % 255;
+        image_data[y + 2] = gray % 255;
+        image_data[y + 3] = 255;
     }
     return std::make_shared<face::Mat>(this->_header, image_data);
 }
 
 std::shared_ptr<face::Mat> face::PGMReader::computeTextData()
 {
-    std::vector<u_int32_t> image_data(this->_header.width * this->_header.height);
+    std::shared_ptr<uint8_t[]> image_data(new uint8_t[4 * this->_header.width * this->_header.height]);
     uint32_t index = 0;
     std::string pixel;
+    int decal = 0;
 
     this->skipHeader(index);
     for(; this->_content[index] != '\0' ; index += 1) {
         if (this->_content[index] >= '0' && this->_content[index] <= '9') {
             pixel += this->_content[index];
         } else {
-            image_data.push_back(std::stoi(pixel));
+            image_data[decal] = std::stoi(pixel) % 255;
+            image_data[decal + 1] = std::stoi(pixel) % 255;
+            image_data[decal + 2] = std::stoi(pixel) % 255;
+            image_data[decal + 3] = 255;
             pixel.clear();
+            decal += 4;
         }
     }
     if (pixel.length() > 0) {
-        image_data.push_back(std::stoi(pixel));
+        image_data[decal] = std::stoi(pixel) % 255;
+        image_data[decal + 1] = std::stoi(pixel) % 255;
+        image_data[decal + 2] = std::stoi(pixel) % 255;
+        image_data[decal + 3] = 255;
         pixel.clear();
     }
     return std::make_shared<face::Mat>(this->_header, image_data);

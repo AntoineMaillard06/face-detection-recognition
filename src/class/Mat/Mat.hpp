@@ -3,6 +3,7 @@
 #include <fstream>
 #include <regex>
 #include <vector>
+#include <memory>
 #include <sys/stat.h>
 
 #include "./../Exception/Exception.hpp"
@@ -17,14 +18,16 @@ namespace face {
 
     class Mat {
         public:
-        Mat(const pgm_header_t &header, const std::vector<u_int32_t> &data);
+        Mat(const pgm_header_t &header, const std::shared_ptr<uint8_t[]> &data);
 
         const uint32_t getWidth() const;
         const uint32_t getHeight() const;
         const uint32_t getMaxGrayScale() const;
 
+        const std::shared_ptr<uint8_t[]> &getPixels() const;
+
         private:
         const pgm_header_t _header;
-        std::vector<u_int32_t> _data;
+        std::shared_ptr<uint8_t[]> _pixels;
     };
 };

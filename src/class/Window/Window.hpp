@@ -1,4 +1,5 @@
 #include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 #include <thread>
 #include <atomic>
 #include <memory>
@@ -17,7 +18,10 @@ namespace face {
         private:
         void windowThread();
 
-        sf::Window _window;
+        sf::RenderWindow _window;
+        sf::Image _sfImage;
+        sf::Texture _sfFaceTexture;
+        sf::Sprite _sfSprite;
         std::shared_ptr<face::Mat> _image;
         std::thread _windowThread;
         std::atomic_bool _isRunning;
